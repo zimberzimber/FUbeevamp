@@ -1,0 +1,24 @@
+{
+	"itemName" : "apiary_frame_advanced",
+	"description" : "Advanced frame for an apiary.",
+	"shortdescription" : "Advanced Frame",
+	"inventoryIcon" : "advanced.png",
+	
+	"rarity" : "Common",
+	"maxStack" : 64,
+	"category" : "craftingMaterial",
+	"itemTags" : ["apiaryFrame"],
+	"dropCollision" : [-2.5, -2.0, 2.5, 2.0],
+	
+	// Stats:
+	// Note that they serve as a direct modifier
+	"baseProduction" : 5,
+	"droneToughness" : 5,
+	"droneBreedRate" : 5,
+	"queenBreedRate" : 5,
+	"queenLifespan" : 5,
+	"mutationChance" : 5,	// Direct modifier. 15 = +15%
+	"miteResistance" : 5,	// Direct modifier. Note that the normal range is -6.48 to 6.48, so use values smaller than 1 for balanced frames
+	"frameWorktimeModifierDay" : false,	// Set to true to enable bees working at day. Setting to false does not disable day time work.
+	"frameWorktimeModifierNight" : false	// Set to true to enable bees working at night. Setting to false does not disable night time work.
+}
