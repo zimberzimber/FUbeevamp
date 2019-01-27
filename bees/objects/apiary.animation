@@ -1,0 +1,208 @@
+{
+	"animatedParts" : {
+		"stateTypes" : {
+			"base" : {
+				"default" : "default",
+				"states" :
+				{
+					"default"	: { "frames" : 1 },
+					"disabled"	: { "frames" : 1 }
+				}
+			},
+			"bees" : {
+				"default" : "off",
+				"states" : {
+					"off" : {
+						"properties" : {
+							"particleEmittersOff" : [ "bees" ]
+						}
+					},
+					"on" : {
+						"frames" : 9,
+						"cycle" : 1.2,
+						"mode" : "loop",
+						"properties" : {
+							"persistentSound" : "/sfx/bees/hive.ogg",
+							"particleEmittersOn" : [ "bees" ]
+						}
+					}
+				}
+			},
+			"loading" : {
+				"default" : "off",
+				"states" :
+				{
+					"off" : { "frames" : 1 },
+					"on"	: {
+						"frames" : 7,
+						"cycle" : 0.8,
+						"mode" : "loop"
+					}
+				}
+			}
+		},
+
+		"parts" : {
+			"base" : {
+				"properties" : { "centered" : false },
+				"partStates" : {
+					"base" : {
+						"default"	: { "properties" : { "image" : "<partImage>:default" } },
+						"disabled"	: { "properties" : { "image" : "<partImage>:disabled" } }
+					}
+				}
+			},
+			"bees" : {
+				"properties" : { 
+					"zLevel" : 1,
+					"centered" : false
+				},
+				"partStates" : {
+					"bees" : {
+						"on" : { "properties" : { "image" : "<partImage>:<frameIndex>" } }
+					}
+				}
+			},
+			"loading" : {
+				"properties" : { 
+					"zLevel" : 2,
+					"centered" : false
+				},
+				"partStates" : {
+					"loading" : {
+						"on" : { "properties" : { "image" : "<partImage>:<frameIndex>" } }
+					}
+				}
+			}
+		}
+	},
+
+	"particleEmitters" : {
+		"bees" : {
+			"emissionRate" : 0.8,
+			"particles" : [
+				{
+					"particle" : "bees",
+					"offset" : [0, 0]
+				},
+				{
+					"particle" : "bees",
+					"offset" : [0, 0]
+				},
+				{
+					"particle" : "bees",
+					"offset" : [0, 0]
+				}
+			]
+		}
+	},
+	
+	"sounds" : {
+		"addMite" : [ "/sfx/interface/mech_energy_low.ogg" ]
+	}
+}
+
+/*
+{
+	"animatedParts" : {
+		"stateTypes" : {
+			"beaconState" : {
+				"default" : "idle",
+				"states" : {
+					"idle" : {
+						"frames" : 1,
+						"cycle" : 0.15
+					},
+					"active" : {
+						"frames" : 1,
+						"cycle" : 0.7,
+						"mode" : "loop"
+					}
+				}
+			},
+			"bees" : {
+				"default" : "off",
+				"states" : {
+					"off" : {
+						"properties" : {
+							"particleEmittersOff" : [ "bees" ]
+						}
+					},
+					"on" : {
+						"frames" : 9,
+						"cycle" : 1.2,
+						"mode" : "loop",
+						"properties" : {
+							"persistentSound" : "/sfx/bees/hive.ogg",
+							"particleEmittersOn" : [ "bees" ]
+						}
+					}
+				}
+			}
+		},
+
+		"parts" : {
+			"bees" : {
+				"partStates" : {
+					"bees" : {
+						"on" : {
+							"properties" : {
+								"centered" : false,
+								"image" : "bees.png:<frameIndex>"
+							}
+						}
+					}
+				}
+			},
+			"beacon" : {
+				"properties" : {
+					"centered" : false,
+					"back" : true
+				},
+
+				"partStates" : {
+					"beaconState" : {
+						"idle" : {
+							"properties" : {
+								"image" : "normalapiary.png"
+							}
+						},
+
+						"active" : {
+							"properties" : {
+								"image" : "normalapiary.png"
+							}
+						}
+					}
+				}
+			}
+
+		}
+	},
+
+	"particleEmitters" : {
+		"bees" : {
+			"emissionRate" : 0.8,
+			"particles" : [
+				{
+					"particle" : "bees",
+					"offset" : [0, 0]
+				},
+				{
+					"particle" : "bees",
+					"offset" : [0, 0]
+				},
+				{
+					"particle" : "bees",
+					"offset" : [0, 0]
+				}
+			]
+		}
+	},
+	
+	"sounds" : {
+		"addMite" : [ "/sfx/interface/mech_energy_low.ogg" ]
+	}
+}
+
+*/

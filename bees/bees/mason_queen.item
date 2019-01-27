@@ -1,0 +1,14 @@
+{
+	"itemName" : "bee_mason_queen",
+	"description" : "Mason Queen",
+	"shortdescription" : "Mason Queen",
+	"inventoryIcon" : "adaptivequeen.png",
+	
+	"rarity" : "Common",
+	"maxStack" : 1,
+	"category" : "craftingMaterial",
+	"itemTags" : ["bee", "queen", "reagent"],
+	"dropCollision" : [-2.5, -2.0, 2.5, 2.0],
+	
+	"beeConfig" : "/bees/bees/baseStats.config"
+}

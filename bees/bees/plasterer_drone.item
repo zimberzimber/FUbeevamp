@@ -1,0 +1,14 @@
+{
+	"itemName" : "bee_plasterer_drone",
+	"description" : "Plasterer Drone",
+	"shortdescription" : "Plasterer Drone",
+	"inventoryIcon" : "adaptivedrone.png",
+	
+	"rarity" : "Common",
+	"maxStack" : 1000,
+	"category" : "craftingMaterial",
+	"itemTags" : ["bee", "drone", "reagent"],
+	"dropCollision" : [-2.5, -2.0, 2.5, 2.0],
+	
+	"beeConfig" : "/bees/bees/baseStats.config"
+}

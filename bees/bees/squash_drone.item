@@ -1,0 +1,14 @@
+{
+	"itemName" : "bee_squash_drone",
+	"description" : "Squash Drone",
+	"shortdescription" : "Squash Drone",
+	"inventoryIcon" : "adaptivedrone.png",
+	
+	"rarity" : "Common",
+	"maxStack" : 1000,
+	"category" : "craftingMaterial",
+	"itemTags" : ["bee", "drone", "reagent"],
+	"dropCollision" : [-2.5, -2.0, 2.5, 2.0],
+	
+	"beeConfig" : "/bees/bees/baseStats.config"
+}

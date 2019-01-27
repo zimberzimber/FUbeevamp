@@ -1,0 +1,8 @@
+{
+  "author" : "zz",
+  "description" : "null",
+  "friendlyName" : "FU Beevamp",
+  "includes" : ["FrackinUniverse"],
+  "name" : "FUbeevamp",
+  "version" : "1"
+}
