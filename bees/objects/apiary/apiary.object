@@ -13,10 +13,10 @@
 	"health" : 0.1,
 	"smashOnBreak" : true, // Dropping is handled via script
 	
-	"inventoryIcon" : "apiaryicon.png",
+	"inventoryIcon" : "icon.png",
 	"orientations" : [
 		{
-			"dualImage" : "apiary.png:<color>.<frame>",
+			"dualImage" : "object.png:default",
 			"imagePosition" : [0, 0],
 			"spaceScan" : 0.1,
 			"anchors" : [ "bottom" ],
@@ -25,7 +25,7 @@
 	],
 	
 	"animation" : "/bees/objects/apiary.animation",
-	"animationParts" : {"beacon" : "apiary.png"},
+	"animationParts" : {"base" : "object.png", "bees" : "bees.png", "loading" : "loading.png"},
 	"animationPosition" : [0, 0],
 	"recipeGroup" : "beetrap",
 	"openSounds" : [ "/sfx/objects/woodenbox_open.ogg" ],

@@ -8,10 +8,7 @@ require "/zb/zb_util.lua"
 
 --[[	TO DO:
 	
-	Add animations for...
-	- Apiary when drones are inactive
-	- Apiary when drones are active (just bees flying around the apiary)
-	- Apiary when its loading the simulated ticks (loading sign?)
+	Implement frame bonuses
 	
 	Get flower likeness
 --]]
@@ -93,7 +90,8 @@ flowerFavor = 1					-- Flower likeness
 function init()
 	biome = world.type()
 	
-	if biome == "unknown" then
+	-- Disabled on ship on player space stations
+	if biome == "unknown" or biome == "playerstation" then
 		script.setUpdateDelta(-1)
 		return
 	end
@@ -123,7 +121,7 @@ function init()
 	-- Init loading animation
 	setAnimationStates(false, false, true)
 	
-	-- Init timer, and offset update delta so you don't end up having 10 hives causing lag spikes due to updating all at the same time
+	-- Init timer, and offset update deltato reduce potential lag spikes when they all update at the same time
 	beeUpdateTimer = beeData.beeUpdateInterval
 	local timerIncrement = config.getParameter("scriptDelta") * 0.01
 	
@@ -326,7 +324,13 @@ function beeTick()
 		world.containerTakeAt(entity.id(), queenSlot-1)
 	end
 	
-	if not ticksToSimulate then
+	-- If simulated ticks, check whether there are still bees to be simulated, and stop simulating if there are none
+	-- Otherwise change animation state according to hive activity
+	if ticksToSimulate then
+		if not hasDrones and not queen then
+			ticksToSimulate = 0
+		end
+	else
 		if haltProduction or not AreDronesActive() then
 			setAnimationStates(true, false, false)
 		else

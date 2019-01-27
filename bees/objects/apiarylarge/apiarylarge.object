@@ -2,7 +2,7 @@
 	"objectName" : "apiary_large_new",
 	"colonyTags" : [ "hive", "bees", "insects" ],
 	"rarity" : "uncommon",
-	"description" : "A bee breeding apiary.",
+	"description" : "A large bee breeding apiary.",
 	"shortdescription" : "^orange;Large Apiary^reset;",
 	"race" : "generic",
 	"subtitle" : "Harvest honey!",
@@ -13,11 +13,10 @@
 	"health" : 0.1,
 	"smashOnBreak" : true, // Dropping is handled via script
 	
-	"inventoryIcon" : "apiarylargeicon.png",
+	"inventoryIcon" : "icon.png",
 	"orientations" : [
 		{
-			"imageLayers" : [ { "image" : "apiary.png:default" } ],
-			"dualImage" : "apiary.png:<color>.<frame>",
+			"dualImage" : "object.png:default",
 			"imagePosition" : [0, 0],
 			"spaceScan" : 0.1,
 			"anchors" : [ "bottom" ],
@@ -26,7 +25,7 @@
 	],
 	
 	"animation" : "/bees/objects/apiary.animation",
-	"animationParts" : {"base" : "apiary.png", "bees" : "Tbees.png", "loading" : "loading.png"},
+	"animationParts" : {"base" : "object.png", "bees" : "bees.png", "loading" : "loading.png"},
 	"animationPosition" : [0, 0],
 	"recipeGroup" : "beetrap",
 	"openSounds" : [ "/sfx/objects/woodenbox_open.ogg" ],
