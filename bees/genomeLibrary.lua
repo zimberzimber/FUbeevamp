@@ -133,11 +133,11 @@ genelib.statToValue = function(val, stat)
 	
 	if stat == "miteResistance" then
 		-- Extra step for mite resistance. See 'numberToGenomeMiteResistance' function for more info
-		local range = genelib.libraryLength^2 / 2
-		num = (num - range) * genelib.miteResistanceStep
+		local range = genelib.libraryLength^2
+		num = (num - range / 2) * genelib.miteResistanceStep
 		
 	elseif stat == "mutationChance" then
-		local range = genelib.libraryLength^2 / 2
+		local range = genelib.libraryLength^2
 		num = math.floor(100/range*100*num)*0.01
 	
 	elseif stat == "workTime" then
@@ -235,7 +235,7 @@ genelib.getAvarageGenome = function(queenGenome, genomeTable)
 				local value = string.sub(genome, (i-1)*2+1, (i-1)*2+2)
 				stats[stat] = stats[stat] + genelib.statToDecimal(value, stat)
 			end
-			stats[stat] = stats[stat] / #genomeTable
+			stats[stat] = math.floor(stats[stat] / #genomeTable + 0.5)
 		end
 	end
 	
@@ -274,10 +274,12 @@ genelib.modifyGenomeStat = function(genome, stat, mod)
 end
 
 -- Modifies each regular stat by a value between -3 to 3 (0 included) based on the genomes mutationChance stat
-genelib.evolveGenome = function(genome)
+-- 'modifier' is a direct modifier to the value. 15 will increase the chance by 15%
+genelib.evolveGenome = function(genome, modifier)
 	stats = genelib.returnFullGenomeStats(genome)
 	local newGenome = ""
 	local chance = genelib.statFromGenomeToValue(genome, "mutationChance")
+	chance = chance + (modifier or 0)
 	
 	-- First, the game has to successfully roll for a stat mutation, based on the bees stat (+ external modifiers)
 	-- If successful, there is a 40% chance there will be no effect, 30% chance for a positive modifier, 30% for negative

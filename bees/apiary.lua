@@ -7,8 +7,11 @@ require "/zb/zb_util.lua"
 --[[		Comments:
 
 --[[	TO DO:
+	Custom bees flying out of the hive:
+	- Spawn bee entity with genome
+	- On die, if "killed" by bug net generate and drop a bee with the same genome
 	
-	Implement frame bonuses
+	Implement queen lifespan
 	
 	Get flower likeness
 --]]
@@ -77,13 +80,35 @@ hivesAroundHive = 0		-- Active hives around the hive
 delayedInit = true		-- Used to delay some things initialization due to how some SBs functions work
 biome = nil				-- The world type/biome
 
+-- Whether the hive has a frame, and the bonus stats it provides
+hasFrame = false
+frameBonuses = {
+	baseProduction = 0,
+	droneToughness = 0,
+	droneBreedRate = 0,
+	queenBreedRate = 0,
+	queenLifespan = 0,
+	mutationChance = 0,
+	miteResistance = 0,
+	frameWorktimeModifierDay = false,
+	frameWorktimeModifierNight = false
+}
+
+-- Table storing functions called by unique frames every bee tick
+-- Which function the frame should call (if at all) is determined within the frames config under 'specialFunction'
+-- Passes 'functionParams' from within the config to the function
+specialFrameFunctions = {
+--	special_name = function()
+--		sb.logError("Hi :)")
+--	end
+}
+
 -- Variables responsible for holding old animation states to prevent restarting animations
 oldBaseState = nil
 oldBeeState = nil
 oldLoadingState = nil
 
 -- Temporary
-biome = "garden"				-- The biome this apiary is located in
 flowerFavor = 1					-- Flower likeness
 
 -- LET IT BEGIIIIIIIIIIIIN
@@ -202,7 +227,11 @@ function beeTick()
 	local hives = world.objectQuery(entity.position(), 10, {withoutEntityId = entity.id(), callScript = "AreDronesActive", callScriptResult = true})
 	hivesAroundHive = #hives
 	
+	-- Production should be halted if theres a rivalry inside the hive
 	local haltProduction = checkRivalries()
+	
+	-- Check if there's a frame and get their bonuses
+	getFrames()
 	
 	-- Check if there was a queen in the queen slot last time the object updated
 	if queen then
@@ -339,6 +368,47 @@ function beeTick()
 	end
 end
 
+-- Check for frames, and get the stat modifiers
+function getFrames()
+	
+	-- Set default values
+	hasFrame = false
+	frameBonuses = {
+		baseProduction = 0,
+		droneToughness = 0,
+		droneBreedRate = 0,
+		queenBreedRate = 0,
+		queenLifespan = 0,
+		mutationChance = 0,
+		miteResistance = 0,
+		allowDay = false,
+		allowNight = false
+	}
+	
+	-- Iterate through frame slots, set 'hasFrame' to true if there's a frame, and add bonuses to the table
+	-- Also call their special function from the 'specialFrameFunctions' table if they have one
+	for _, frameSlot in ipairs(frameSlots) do
+		if contents[frameSlot] and root.itemHasTag(contents[frameSlot].name, "apiaryFrame") then
+			hasFrame = true
+			local cfg = root.itemConfig(contents[frameSlot].name)
+			
+			for stat, value in pairs(frameBonuses) do
+				if stat == "allowDay" or stat == "allowNight" then
+					if cfg.config[stat] then
+						frameBonuses[stat] = true
+					end
+				elseif cfg.config[stat] then
+					frameBonuses[stat] = frameBonuses[stat] + cfg.config[stat]
+				end
+			end
+			
+			if specialFrameFunctions[cfg.config.specialFunction] then
+				specialFrameFunctions[cfg.config.specialFunction](cfg.config.functionParams)
+			end
+		end
+	end
+end
+
 -- Function used by external sources to get current time remaining until next bee production
 function GetUpdateTimer() return beeUpdateTimer end
 
@@ -373,26 +443,6 @@ function isHiveQueenActive(externalCall)
 		return false
 	end
 	
-	-- Check if the apiary has frames, and if they modify work time
-	local hasFrame = false
-	local frameWorktimeModifierDay = false
-	local frameWorktimeModifierNight = false
-	
-	for _, frameSlot in ipairs(frameSlots) do
-		if contents[frameSlot] and root.itemHasTag(contents[frameSlot].name, "apiaryFrame") then
-			hasFrame = true
-			local cfg = root.itemConfig(contents[frameSlot].name)
-			
-			if cfg.config.allowDay then
-				frameWorktimeModifierDay = true
-			end
-			
-			if cfg.config.allowNight then
-				frameWorktimeModifierNight = true
-			end
-		end
-	end
-	
 	-- No frames = no activity
 	if not hasFrame then
 		hiveQueenActive = false
@@ -405,7 +455,7 @@ function isHiveQueenActive(externalCall)
 		return true
 	end
 	
-	-- Get the worktime stat, and check if the queen should be active, taking work time modifying frames into account
+	-- Get worktime, and check if the queen should be active during this time. Include frame effects.
 	local workTime = genelib.statFromGenomeToValue(queen.parameters.genome, "workTime")
 	local timeOfDay = world.timeOfDay()
 	
@@ -414,13 +464,13 @@ function isHiveQueenActive(externalCall)
 		return true
 		
 	elseif timeOfDay <= 0.5 then
-		if workTime == "day" or frameWorktimeModifierDay then
+		if workTime == "day" or frameBonuses.allowDay then
 			hiveQueenActive = true
 			return true
 		end
 		
 	else
-		if workTime == "night" or frameWorktimeModifierNight then
+		if workTime == "night" or frameBonuses.allowNight then
 			hiveQueenActive = true
 			return true
 		end
@@ -446,8 +496,8 @@ function queenProduction()
 	end
 	
 	-- Queen production is unaffected by hives around hive
-	local productionDrone = genelib.statFromGenomeToValue(queen.parameters.genome, "droneBreedRate") * ((flowerFavor + biomeFavor) / 2)
-	local productionQueen = genelib.statFromGenomeToValue(queen.parameters.genome, "queenBreedRate") * ((flowerFavor + biomeFavor) / 2)
+	local productionDrone = genelib.statFromGenomeToValue(queen.parameters.genome, "droneBreedRate") + frameBonuses.droneBreedRate * ((flowerFavor + biomeFavor) / 2)
+	local productionQueen = genelib.statFromGenomeToValue(queen.parameters.genome, "queenBreedRate") + frameBonuses.queenBreedRate * ((flowerFavor + biomeFavor) / 2)
 	youngQueenProgress = youngQueenProgress + productionQueen * (math.random(beeData.productionRandomModifierRange[1],beeData.productionRandomModifierRange[2]) * 0.01)
 	droneProgress = droneProgress + productionDrone * (math.random(beeData.productionRandomModifierRange[1],beeData.productionRandomModifierRange[2]) * 0.01)
 	
@@ -537,7 +587,7 @@ function generateYoungQueen()
 	end
 	
 	local newGenome = genelib.getAvarageGenome(queen.parameters.genome, genomeTable)
-	newGenome = genelib.evolveGenome(newGenome)
+	newGenome = genelib.evolveGenome(newGenome, frameBonuses.mutationChance)
 	
 	descriptor.parameters = {genome = newGenome}
 	return descriptor
@@ -583,7 +633,7 @@ end
 -- Receives a slot and reduces the amount of drones there based on the drones mite resistance stat and the amount of mites
 function miteDamage(slot)
 	-- Having this be 0 will instantly kill all drones as soon as a mite is added
-	local toughness = math.max(genelib.statFromGenomeToValue(contents[slot].parameters.genome, "droneToughness"), 1)
+	local toughness = math.max(genelib.statFromGenomeToValue(contents[slot].parameters.genome, "droneToughness") + frameBonuses.droneToughness, 1)
 	
 	world.containerTakeNumItemsAt(entity.id(), slot-1, math.floor(storage.mites / toughness))
 	contents[slot] = world.containerItemAt(entity.id(), slot-1)
@@ -591,26 +641,6 @@ end
 
 -- Checks if the passed drone is active
 function isDroneActive(drone)
-	
-	-- Check if the apiary has frames, and if they modify work time
-	local hasFrame = false
-	local frameWorktimeModifierDay = false
-	local frameWorktimeModifierNight = false
-	
-	for _, frameSlot in ipairs(frameSlots) do
-		if contents[frameSlot] and root.itemHasTag(contents[frameSlot].name, "apiaryFrame") then
-			hasFrame = true
-			local cfg = root.itemConfig(contents[frameSlot].name)
-			
-			if cfg.config.allowDay then
-				frameWorktimeModifierDay = true
-			end
-			
-			if cfg.config.allowNight then
-				frameWorktimeModifierNight = true
-			end
-		end
-	end
 	
 	-- No frames = no activity
 	if not hasFrame then
@@ -628,12 +658,12 @@ function isDroneActive(drone)
 		return true
 		
 	elseif timeOfDay <= 0.5 then
-		if workTime == "day" or frameWorktimeModifierDay then
+		if workTime == "day" or frameBonuses.allowDay then
 			return true
 		end
 		
 	else
-		if workTime == "night" or frameWorktimeModifierNight then
+		if workTime == "night" or frameBonuses.allowNight then
 			return true
 		end
 	end
@@ -670,7 +700,7 @@ function droneProduction(drone)
 		return
 	end
 	
-	local productionStat = genelib.statFromGenomeToValue(drone.parameters.genome, "baseProduction")
+	local productionStat = genelib.statFromGenomeToValue(drone.parameters.genome, "baseProduction") + frameBonuses.baseProduction
 	local production = productionStat * (((drone.count / 1000) + math.min(1 / ((1 + hivesAroundHive) * 0.75), 1) + flowerFavor + biomeFavor) / 4)
 	
 	local family = family(drone.name)
@@ -715,7 +745,7 @@ function miteGrowth()
 		for _, slot in ipairs(droneSlots) do
 			local item = contents[slot]
 			if item and root.itemHasTag(item.name, "bee") and root.itemHasTag(item.name, "drone") then
-				hiveMiteResistance = hiveMiteResistance + genelib.statFromGenomeToValue(item.parameters.genome, "miteResistance")
+				hiveMiteResistance = hiveMiteResistance + genelib.statFromGenomeToValue(item.parameters.genome, "miteResistance") + frameBonuses.miteResistance
 				droneCount = droneCount + 1
 			end
 		end
@@ -771,6 +801,7 @@ function droneFight(slot1, slot2)
 	local bee1 = contents[slot1]
 	local bee2 = contents[slot2]
 	
+	-- Not including frame bonus here because its redundant
 	local tough1 = genelib.statFromGenomeToValue(bee1.parameters.genome, "droneToughness")
 	local tough2 = genelib.statFromGenomeToValue(bee2.parameters.genome, "droneToughness")
 	

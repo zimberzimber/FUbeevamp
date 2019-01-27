@@ -76,7 +76,7 @@
 		"type" : "label",
 		"position" : [11, 41],
 		"hAnchor" : "left",
-		"value" : "Mutation Chance:"
+		"value" : "Mutation Chance: (%)"
 	},
 	"mutationChanceLabel" : {
 		"type" : "label",
