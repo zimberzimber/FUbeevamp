@@ -16,13 +16,6 @@ require "/zb/zb_util.lua"
 	Get flower likeness
 --]]
 
---[[	Stuff with potential:
-	`List<String>` world.environmentStatusEffects(entity.position())
-	`bool` world.underground(`Vec2F` position)
-	`bool` world.inSurfaceLayer(`Vec2I` position)
-	`int` world.oceanLevel(`Vec2I` position)
---]]
-
 --[[	Updating tooltips:
 	You must "rebuild" the item.
 	Just copy the items data, add the right tags, removing the original item, and readding the one with the tags
@@ -881,7 +874,7 @@ function getBiomeFavor(name)
 	if favor == 3 then return beeData.biomeFavorite end
 end
 
--- Used to handled animation. Base = the apiary itself, bees = the 
+-- Used to handled animation. Base = the apiary itself, bees = the bees flying around, loading = loading sign
 function setAnimationStates(base, bees, loading)
 	if oldBaseState ~= base then
 		oldBaseState = base
@@ -911,5 +904,19 @@ function setAnimationStates(base, bees, loading)
 		else
 			animator.setAnimationState("loading", "off", true)
 		end
+	end
+end
+
+-- Check whether there aren't too many bees entities flying about
+function SpaceForBees()
+	local bees = world.monsterQuery(entity.position(), beeData.beeEntityCheckRadius, { callScript = 'getClass', callScriptResult = 'bee' })
+	local apiaries = world.entityQuery(entity.position(), beeData.beeEntityCheckRadius, { withoutEntityId = entity.id(), callScript = 'getClass', callScriptResult = 'apiary' })
+	return #bees < beeData.maxBeeEntities + beeData.extraBeeEntitiesPerApiary * #apiaries
+end
+
+-- Attempt spawning a bee entity to roam about
+function TryBeeSpawn(family, type, chance)
+	if math.random() <= chance and spaceForBees() then
+		world.spawnMonster(string.format("bee_%s_%s", family, type), object.toAbsolutePosition({ 2, 3 }), { level = 1 })
 	end
 end
