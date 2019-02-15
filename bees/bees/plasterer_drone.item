@@ -2,7 +2,8 @@
 	"itemName" : "bee_plasterer_drone",
 	"description" : "Plasterer Drone",
 	"shortdescription" : "Plasterer Drone",
-	"inventoryIcon" : "adaptivedrone.png",
+	"inventoryIcon" : "plasterer.png:drone",
+	"tooltipKind" : "bee",
 	
 	"rarity" : "Common",
 	"maxStack" : 1000,
@@ -10,5 +11,6 @@
 	"itemTags" : ["bee", "drone", "reagent"],
 	"dropCollision" : [-2.5, -2.0, 2.5, 2.0],
 	
+	"builder" : "/bees/bees/beeBuilder.lua",
 	"beeConfig" : "/bees/bees/baseStats.config"
 }

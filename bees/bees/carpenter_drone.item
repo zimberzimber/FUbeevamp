@@ -2,7 +2,7 @@
 	"itemName" : "bee_carpenter_drone",
 	"description" : "Carpenter Drone",
 	"shortdescription" : "Carpenter Drone",
-	"inventoryIcon" : "adaptivedrone.png",
+	"inventoryIcon" : "carpenter.png:drone",
 	"tooltipKind" : "bee",
 	
 	"rarity" : "Common",

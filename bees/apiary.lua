@@ -7,9 +7,6 @@ require "/zb/zb_util.lua"
 --[[		Comments:
 
 --[[	TO DO:
-	Custom bees flying out of the hive:
-	- Spawn bee entity with genome
-	- On die, if "killed" by bug net generate and drop a bee with the same genome
 	
 	Implement queen lifespan
 	
@@ -72,6 +69,7 @@ queen = nil				-- Contains the queen or nil if there's no queen
 hivesAroundHive = 0		-- Active hives around the hive
 delayedInit = true		-- Used to delay some things initialization due to how some SBs functions work
 biome = nil				-- The world type/biome
+beeTickDelta = 0		-- Variable holding delta between bee ticks.
 
 -- Whether the hive has a frame, and the bonus stats it provides
 hasFrame = false
@@ -91,9 +89,22 @@ frameBonuses = {
 -- Which function the frame should call (if at all) is determined within the frames config under 'specialFunction'
 -- Passes 'functionParams' from within the config to the function
 specialFrameFunctions = {
---	special_name = function()
---		sb.logError("Hi :)")
---	end
+--	Note: These functions are only called once per frame referencing the function every bee tick.
+--	Note: They also don't take into account bee activity, so check for bees as required:
+--		isHiveQueenActive(true) - will return if the queen is active
+--		AreDronesActive() - will return if at least one instance of drones is active
+--	Tip: Use 'beeTickDelta' to get delta between bee ticks.
+
+	advancedFrame = function(data)
+		if not advancedFrameTimer then
+			advancedFrameTimer = data[1]
+		elseif advancedFrameTimer <= 0 then
+			sb.logInfo(data[2])
+		else
+			advancedFrameTimer = advancedFrameTimer - beeTickDelta
+		end
+	end
+	
 }
 
 -- Variables responsible for holding old animation states to prevent restarting animations
@@ -189,9 +200,11 @@ end
 -- Called as update when the first update is done
 function update2(dt)
 	beeUpdateTimer = beeUpdateTimer - dt
+	beeTickDelta = beeTickDelta + dt
 	if beeUpdateTimer <= 0 then
 		beeUpdateTimer = beeData.beeUpdateInterval
 		beeTick()
+		beeTickDelta = 0
 	end
 end
 

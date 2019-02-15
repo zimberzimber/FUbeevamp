@@ -2,7 +2,7 @@
 	"itemName" : "bee_mason_youngQueen",
 	"description" : "Mason Young Queen",
 	"shortdescription" : "Young Mason Queen",
-	"inventoryIcon" : "mason_youngQueen.png",
+	"inventoryIcon" : "mason.png:youngQueen",
 	"tooltipKind" : "bee",
 	
 	"rarity" : "Common",

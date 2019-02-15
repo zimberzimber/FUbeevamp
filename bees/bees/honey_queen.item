@@ -2,7 +2,7 @@
 	"itemName" : "bee_honey_queen",
 	"description" : "Honey Queen",
 	"shortdescription" : "Honey Queen",
-	"inventoryIcon" : "adaptivequeen.png",
+	"inventoryIcon" : "honey.png:queen",
 	
 	"rarity" : "Common",
 	"maxStack" : 1,
@@ -10,5 +10,6 @@
 	"itemTags" : ["bee", "queen", "reagent"],
 	"dropCollision" : [-2.5, -2.0, 2.5, 2.0],
 	
+	"builder" : "/bees/bees/beeBuilder.lua",
 	"beeConfig" : "/bees/bees/baseStats.config"
 }

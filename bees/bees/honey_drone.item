@@ -2,7 +2,7 @@
 	"itemName" : "bee_honey_drone",
 	"description" : "Honey Drone",
 	"shortdescription" : "Honey Drone",
-	"inventoryIcon" : "adaptivedrone.png",
+	"inventoryIcon" : "honey.png:drone",
 	
 	"rarity" : "Common",
 	"maxStack" : 1000,
@@ -10,5 +10,6 @@
 	"itemTags" : ["bee", "drone", "reagent"],
 	"dropCollision" : [-2.5, -2.0, 2.5, 2.0],
 	
+	"builder" : "/bees/bees/beeBuilder.lua",
 	"beeConfig" : "/bees/bees/baseStats.config"
 }

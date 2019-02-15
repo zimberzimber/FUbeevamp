@@ -2,7 +2,7 @@
 	"itemName" : "bee_squash_youngQueen",
 	"description" : "Squash Young Queen",
 	"shortdescription" : "Young Squash Queen",
-	"inventoryIcon" : "squash_youngQueen.png",
+	"inventoryIcon" : "squash.png:youngQueen",
 	"tooltipKind" : "bee",
 	
 	"rarity" : "Common",

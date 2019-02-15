@@ -2,7 +2,7 @@
 	"itemName" : "bee_leafcutter_youngQueen",
 	"description" : "Leafcutter Young Queen",
 	"shortdescription" : "Young Leafcutter Queen",
-	"inventoryIcon" : "leafcutter_youngQueen.png",
+	"inventoryIcon" : "leafcutter.png:youngQueen",
 	"tooltipKind" : "bee",
 	
 	"rarity" : "Common",

@@ -11,7 +11,7 @@ function damage(args)
 end
 
 -- If the bee died as captured, and it has a genome, and the item name starts with the bees (i.e bee_carpenter_queen from bee_carpenter), generate an item with the genome instead
--- Doing the item name check in case other drops are added to the bugnet drop list. Don't want them having a genome to break stacking.
+-- Doing the item name check in case other drops are added to the bugnet drop list. Don't want them having a param breaking stacking.
 function die()
 	if captured then
 		local genome = config.getParameter("genome", nil)
