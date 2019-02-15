@@ -38,7 +38,7 @@
 	
 	// Params required for the apiary script
 	"uiConfig" : "/bees/interface/apiary/largeapiary.config",
-	"slotCount" : 21,
+	"slotCount" : 20,
 	"queenSlot" : 1,
 	"droneSlots" : [ 2, 3 ],
 	"frameSlots" : [ 4, 5 ],
