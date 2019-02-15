@@ -37,7 +37,7 @@
 	"scriptDelta" : 5,
 	
 	// Params required for the apiary script
-	"uiConfig" : "/bees/interface/apiary/apiary.config",
+	"uiConfig" : "/bees/interface/apiary/smallapiary.config",
 	"slotCount" : 12,
 	"queenSlot" : 1,
 	"droneSlots" : [ 2 ],

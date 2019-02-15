@@ -134,7 +134,7 @@ function init()
 	storage.mites = storage.mites or 0
 	
 	-- Init loading animation
-	setAnimationStates(false, false, true)
+	setAnimationStates(true, false, false)
 	
 	-- Init timer, and offset update deltato reduce potential lag spikes when they all update at the same time
 	beeUpdateTimer = beeData.beeUpdateInterval
@@ -154,6 +154,7 @@ function update(dt)
 	if not ticksToSimulate then
 		-- Get amount of ticks the apiary should simulate. (off-screen production simulation)
 		if storage.lastActive then
+			setAnimationStates(false, false, true)
 			object.setInteractive(false)
 			ticksToSimulate = (storage.unfinishedTicks or 0) + math.floor((world.time() - storage.lastActive) / beeData.unloadedUpdateInterval)
 			storage.unfinishedTicks = nil
@@ -173,6 +174,7 @@ function update(dt)
 			end
 		else
 			-- Renable interaction if done simulating ticks
+			setAnimationStates(true, false, false)
 			ticksToSimulate = nil
 			object.setInteractive(true)
 			update = update2

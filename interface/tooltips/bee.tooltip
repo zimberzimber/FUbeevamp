@@ -1,3 +1,6 @@
+
+// Had to put this here because SB simply cannot fathom that tooltips can exist outside of the "/interace/tooltips" directory
+// But anything else is fair game
 {
 	"background" : {
 		"type" : "background",
