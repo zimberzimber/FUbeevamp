@@ -1,14 +1,14 @@
 {
 	"itemName" : "bee_plasterer_youngQueen",
 	"description" : "Plasterer Young Queen",
-	"shortdescription" : "Plasterer Queen",
-	"inventoryIcon" : "youngqueen.png",
+	"shortdescription" : "Young Plasterer Queen",
+	"inventoryIcon" : "plasterer_youngQueen.png",
 	"tooltipKind" : "bee",
 	
 	"rarity" : "Common",
 	"maxStack" : 1,
 	"category" : "craftingMaterial",
-	"itemTags" : ["bee", "queen", "reagent"],
+	"itemTags" : ["bee", "youngQueen", "reagent"],
 	"dropCollision" : [-2.5, -2.0, 2.5, 2.0],
 	
 	"builder" : "/bees/bees/beeBuilder.lua",

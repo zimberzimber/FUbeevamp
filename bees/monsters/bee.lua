@@ -1,4 +1,8 @@
 
+-- Method to differentiate between bees and other monsters
+function getClass() return "bee" end
+
+-- Set bee as captured and kill it if it was harmed by a bugnet
 function damage(args)
 	if args.sourceKind == "bugnet" then
 		captured = true
@@ -6,22 +10,19 @@ function damage(args)
 	end
 end
 
+-- If the bee died as captured, and it has a genome, and the item name starts with the bees (i.e bee_carpenter_queen from bee_carpenter), generate an item with the genome instead
+-- Doing the item name check in case other drops are added to the bugnet drop list. Don't want them having a genome to break stacking.
 function die()
 	if captured then
-		local params = config.getParameter("param", nil)
-		sb.logError("params = %s", params)
+		local genome = config.getParameter("genome", nil)
 		
-		if params then
+		if genome then
+			local item = root.createTreasure(monster.type(), 1)
 			
-			local dropPools = config.getParameter("dropPools", nil)
-			local asd = root.monsterParameters(monster.type())
-			-- local item = root.createTreasure(dropPools["bugnet"], world.threatLevel())
-			
-			sb.logError("dropPools = %s", dropPools)
-			sb.logError("asd = %s", asd)
-			
-			world.spawnMonster(monster.type(), entity.position(), {param = params + 1})
-			monster.setDropPool(nil)
+			if string.find(item, monster.name) then
+				world.spawnItem(item[1].name, entity.position(), 1, {genome = genome})
+				monster.setDropPool(nil)
+			end
 		end
 	end
 end

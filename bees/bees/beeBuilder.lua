@@ -43,7 +43,7 @@ function build(directory, config, parameters, level, seed)
 				local underscore2 = string.find(config.itemName, "_", underscore1+1)
 				local beeName = string.sub(config.itemName, underscore1+1, underscore2-1)
 				
-				local subtype = root.assetJson("/bees/bees/baseStats.config").stats[beeName][value].name
+				local subtype = root.assetJson("/bees/bees/beeData.config").stats[beeName][value].name
 				subtype = string.gsub(subtype, ".", string.upper, 1)
 				config.tooltipFields.subTitle = "Subtype: "..subtype
 				

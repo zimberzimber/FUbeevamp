@@ -2,7 +2,7 @@
 	"itemName" : "bee_carpenter_youngQueen",
 	"description" : "Carpenter Young Queen",
 	"shortdescription" : "Young Carpenter Queen",
-	"inventoryIcon" : "youngqueen.png",
+	"inventoryIcon" : "carpenter_youngQueen.png",
 	"tooltipKind" : "bee",
 	
 	"rarity" : "Common",

@@ -1,14 +1,14 @@
 {
 	"itemName" : "bee_honey_youngQueen",
 	"description" : "Honey Young Queen",
-	"shortdescription" : "Honey Queen",
-	"inventoryIcon" : "youngqueen.png",
+	"shortdescription" : "Young Honey Queen",
+	"inventoryIcon" : "honey_youngQueen.png",
 	"tooltipKind" : "bee",
 	
 	"rarity" : "Common",
 	"maxStack" : 1,
 	"category" : "craftingMaterial",
-	"itemTags" : ["bee", "queen", "reagent"],
+	"itemTags" : ["bee", "youngQueen", "reagent"],
 	"dropCollision" : [-2.5, -2.0, 2.5, 2.0],
 	
 	"builder" : "/bees/bees/beeBuilder.lua",

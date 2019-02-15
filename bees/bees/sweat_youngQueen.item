@@ -1,14 +1,14 @@
 {
 	"itemName" : "bee_sweat_youngQueen",
 	"description" : "Sweat Young Queen",
-	"shortdescription" : "Sweat Queen",
-	"inventoryIcon" : "youngqueen.png",
+	"shortdescription" : "Young Sweat Queen",
+	"inventoryIcon" : "sweat_youngQueen.png",
 	"tooltipKind" : "bee",
 	
 	"rarity" : "Common",
 	"maxStack" : 1,
 	"category" : "craftingMaterial",
-	"itemTags" : ["bee", "queen", "reagent"],
+	"itemTags" : ["bee", "youngQueen", "reagent"],
 	"dropCollision" : [-2.5, -2.0, 2.5, 2.0],
 	
 	"builder" : "/bees/bees/beeBuilder.lua",

@@ -104,19 +104,22 @@ oldLoadingState = nil
 -- Temporary
 flowerFavor = 1					-- Flower likeness
 
+-- Method to differentiate between apiaries and other objects
+function getClass() return "apiary" end
+
 -- LET IT BEGIIIIIIIIIIIIN
 function init()
 	biome = world.type()
 	
 	-- Disabled on ship on player space stations
-	if biome == "unknown" or biome == "playerstation" then
-		script.setUpdateDelta(-1)
-		return
-	end
+	-- if biome == "unknown" or biome == "playerstation" then
+		-- script.setUpdateDelta(-1)
+		-- return
+	-- end
 	
 	-- Retrieve data
 	maxStackDefault = root.assetJson("/items/defaultParameters.config").defaultMaxStack
-	beeData = root.assetJson("/bees/bees/baseStats.config")
+	beeData = root.assetJson("/bees/bees/beeData.config")
 	slotCount = config.getParameter("slotCount")
 	queenSlot = config.getParameter("queenSlot")
 	droneSlots = config.getParameter("droneSlots")
@@ -487,6 +490,8 @@ function queenProduction()
 	if ticksToSimulate and ticksToSimulate % 2 == 1 and genelib.statFromGenomeToValue(queen.parameters.genome, "workTime") ~= "both" then
 		return
 	end
+	
+	if not ticksToSimulate then TryBeeSpawn(family(queen.name)) end
 	
 	-- Queen production is unaffected by hives around hive
 	local productionDrone = genelib.statFromGenomeToValue(queen.parameters.genome, "droneBreedRate") + frameBonuses.droneBreedRate * ((flowerFavor + biomeFavor) / 2)
@@ -908,15 +913,15 @@ function setAnimationStates(base, bees, loading)
 end
 
 -- Check whether there aren't too many bees entities flying about
-function SpaceForBees()
+function spaceForBees()
 	local bees = world.monsterQuery(entity.position(), beeData.beeEntityCheckRadius, { callScript = 'getClass', callScriptResult = 'bee' })
 	local apiaries = world.entityQuery(entity.position(), beeData.beeEntityCheckRadius, { withoutEntityId = entity.id(), callScript = 'getClass', callScriptResult = 'apiary' })
 	return #bees < beeData.maxBeeEntities + beeData.extraBeeEntitiesPerApiary * #apiaries
 end
 
 -- Attempt spawning a bee entity to roam about
-function TryBeeSpawn(family, type, chance)
-	if math.random() <= chance and spaceForBees() then
-		world.spawnMonster(string.format("bee_%s_%s", family, type), object.toAbsolutePosition({ 2, 3 }), { level = 1 })
+function TryBeeSpawn(family)
+	if math.random() <= beeData.beeSpawnChance and spaceForBees() then
+		world.spawnMonster(string.format("bee_%s", family), object.toAbsolutePosition({ 2, 3 }), { level = 1 })
 	end
 end
