@@ -3,6 +3,7 @@
 	"description" : "Honey Queen",
 	"shortdescription" : "Honey Queen",
 	"inventoryIcon" : "honey.png:queen",
+	"tooltipKind" : "bee",
 	
 	"rarity" : "Common",
 	"maxStack" : 1,

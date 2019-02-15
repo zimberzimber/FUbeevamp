@@ -3,7 +3,5 @@
 	"category": "bee_carpenter",
 	"type": "body",
 
-	"frames": {
-		"body": "carpenter.png"
-	}
+	"frames": {	"body": "carpenter.png"	}
 }

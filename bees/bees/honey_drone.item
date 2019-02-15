@@ -3,6 +3,7 @@
 	"description" : "Honey Drone",
 	"shortdescription" : "Honey Drone",
 	"inventoryIcon" : "honey.png:drone",
+	"tooltipKind" : "bee",
 	
 	"rarity" : "Common",
 	"maxStack" : 1000,

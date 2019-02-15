@@ -30,29 +30,19 @@
 	"recipeGroup" : "beetrap",
 	"openSounds" : [ "/sfx/objects/woodenbox_open.ogg" ],
 	
+	"frameCooldown" : 67,
+	"autoCloseCooldown" : 3600,
+	
 	"scripts" : [ "/bees/apiary.lua" ],
 	"scriptDelta" : 5,
 	
+	// Params required for the apiary script
 	"uiConfig" : "/bees/interface/apiary/apiary.config",
-	"slotCount" : 19,
+	"slotCount" : 12,
 	"queenSlot" : 1,
 	"droneSlots" : [ 2 ],
 	"frameSlots" : [ 3 ],
-	"firstInventorySlot" : 4,
-	
-	"frameCooldown" : 67,
-	"autoCloseCooldown" : 3600,
-
-	// see also scentedapiary.object and normalalveary.object
-	"spawnDelay" : 1.0,
-	"spawnBeeBrake" : 200,
-	"spawnItemBrake" : 125,
-	"spawnHoneyBrake" : 150,
-	"spawnDroneBrake" : 150,
-	"limitDroneCount" : true,
-	"beeStingChance" : 0.2,
-	"beeStingOffset" : [ 2, 1.5 ],
-	"beePowerScaling" :  1
+	"firstInventorySlot" : 4
 
 //	"inputNodes":[[0,0]],
 //	"outputNodes":[[0,1]],
