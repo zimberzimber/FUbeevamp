@@ -22,7 +22,6 @@ require "/zb/zb_util.lua"
 
 --[[	Misc.
 
-	Bee subtypes:
 	beeSubtypeIDs = {
 		plasterer = {"isovapitdae", "harlequin", "shrouded", "stellar"},
 		sweat = {"xenodaemonae", "redbanded", "assassin", "killer"},
@@ -33,21 +32,6 @@ require "/zb/zb_util.lua"
 		mason = {"gelid", "digger", "oremason"}
 	}
 
-	beeFamilyRivalries = {
-		carpenter = "mason",
-		mason = "carpenter",
-		
-		plasterer = "squash",
-		squash = "leafcutter",
-		leafcutter = "sweat",
-		sweat = "honey",
-		honey = "plasterer"
-	}
-	
-	bee_[family]_[type]
-	bee_mason_queen
-	bee_carpenter_drone
-
 	Progress increases by the bees production stat multiplied by the hives production efficiency with a small random factor which applies for each product separetly
 	Same applies to the queens production as well, but does not take drones into account
 	Full formula:
@@ -57,9 +41,8 @@ require "/zb/zb_util.lua"
 	[B] = Biome Favor (0 / 0.5 / 1 / 1.5)
 	Production Multiplier = ([D] + [H] + [F] + [B]) / 4
 	Production Stat * Production Multiplier * (math.random(90,110) * 0.01)
-
-	Use this function to find active hives around this hive:
-	world.callScriptedEntity(`EntityId` entityId, `String` functionName, [`LuaValue` args ...])
+	
+	Bee item image frames have a FFFFFF01 Hex colored pixels on the bottom left and top right of the frame because SB resizes the item image
 --]]
 
 --]]
@@ -130,7 +113,7 @@ function init()
 	
 	-- Retrieve data
 	maxStackDefault = root.assetJson("/items/defaultParameters.config").defaultMaxStack
-	beeData = root.assetJson("/bees/bees/beeData.config")
+	beeData = root.assetJson("/bees/beeData.config")
 	slotCount = config.getParameter("slotCount")
 	queenSlot = config.getParameter("queenSlot")
 	droneSlots = config.getParameter("droneSlots")
@@ -504,7 +487,7 @@ function queenProduction()
 		return
 	end
 	
-	if not ticksToSimulate then TryBeeSpawn(family(queen.name)) end
+	if not ticksToSimulate then TryBeeSpawn(family(queen.name), queen.parameters.genome) end
 	
 	-- Queen production is unaffected by hives around hive
 	local productionDrone = genelib.statFromGenomeToValue(queen.parameters.genome, "droneBreedRate") + frameBonuses.droneBreedRate * ((flowerFavor + biomeFavor) / 2)
@@ -933,8 +916,8 @@ function spaceForBees()
 end
 
 -- Attempt spawning a bee entity to roam about
-function TryBeeSpawn(family)
+function TryBeeSpawn(family, genome)
 	if math.random() <= beeData.beeSpawnChance and spaceForBees() then
-		world.spawnMonster(string.format("bee_%s", family), object.toAbsolutePosition({ 2, 3 }), { level = 1 })
+		world.spawnMonster(string.format("bee_%s", family), object.toAbsolutePosition({ 2, 3 }), { genome = genome })
 	end
 end

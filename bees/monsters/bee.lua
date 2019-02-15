@@ -19,7 +19,7 @@ function die()
 		if genome then
 			local item = root.createTreasure(monster.type(), 1)
 			
-			if string.find(item, monster.name) then
+			if string.find(item[1].name, monster.type()) then
 				world.spawnItem(item[1].name, entity.position(), 1, {genome = genome})
 				monster.setDropPool(nil)
 			end

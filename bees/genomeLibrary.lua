@@ -184,7 +184,7 @@ end
 
 -- Generate and return a genome with the default values for the recieved bee name
 genelib.generateDefaultGenome = function(beeName)
-	local defaultValues = root.assetJson("/bees/bees/baseStats.config").stats
+	local defaultValues = root.assetJson("/bees/beeData.config").stats
 	
 	-- Clear potential additions to the name.
 	local underscore1 = string.find(beeName, "_")

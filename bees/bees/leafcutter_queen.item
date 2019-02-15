@@ -11,6 +11,6 @@
 	"itemTags" : ["bee", "queen", "reagent"],
 	"dropCollision" : [-2.5, -2.0, 2.5, 2.0],
 	
-	"builder" : "/bees/bees/beeBuilder.lua",
-	"beeConfig" : "/bees/bees/baseStats.config"
+	"builder" : "/bees/beeBuilder.lua",
+	"beeConfig" : "/bees/beeData.config"
 }
