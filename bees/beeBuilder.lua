@@ -22,17 +22,14 @@ function build(directory, config, parameters, level, seed)
 		parameters.genome = genelib.generateDefaultGenome(config.itemName)
 	end
 	
+	-- Add the wild icon if needed
 	if parameters.wild then
 		config.tooltipFields.objectImage = "/interface/tooltips/wildImage.png"
 	else
 		config.tooltipFields.objectImage = "/assetmissing.png"
 	end
 	
-	-- TEMPORARY!
-	if not root.itemHasTag(config.itemName, "drone") then
-		parameters.genomeInspected = true
-	end
-	
+	-- Display the genome if the bee was inspected
 	if parameters.genomeInspected then
 		require "/bees/genomeLibrary.lua"
 		

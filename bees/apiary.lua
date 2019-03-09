@@ -9,7 +9,7 @@ require "/zb/zb_util.lua"
 --[[	TO DO:
 	
 	Implement queen lifespan
-	
+	Add a timer to adding bees so drones don't instadie when there is no queen in the hive for example
 	Get flower likeness
 --]]
 
@@ -53,6 +53,8 @@ hivesAroundHive = 0		-- Active hives around the hive
 delayedInit = true		-- Used to delay some things initialization due to how some SBs functions work
 biome = nil				-- The world type/biome
 beeTickDelta = 0		-- Variable holding delta between bee ticks.
+noQueenTimer = 0		-- Time left before drones start dying without a queen
+noQueenTimeAllowed = 3	-- Time before drones start dying without a queen
 
 -- Whether the hive has a frame, and the bonus stats it provides
 hasFrame = false
@@ -105,11 +107,11 @@ function getClass() return "apiary" end
 function init()
 	biome = world.type()
 	
-	-- Disabled on ship on player space stations
-	-- if biome == "unknown" or biome == "playerstation" then
-		-- script.setUpdateDelta(-1)
-		-- return
-	-- end
+	-- Disabled on ship and player space stations
+	if biome == "unknown" or biome == "playerstation" then
+		script.setUpdateDelta(-1)
+		return
+	end
 	
 	-- Retrieve data
 	maxStackDefault = root.assetJson("/items/defaultParameters.config").defaultMaxStack
@@ -186,6 +188,7 @@ end
 function update2(dt)
 	beeUpdateTimer = beeUpdateTimer - dt
 	beeTickDelta = beeTickDelta + dt
+	
 	if beeUpdateTimer <= 0 then
 		beeUpdateTimer = beeData.beeUpdateInterval
 		beeTick()
@@ -196,7 +199,7 @@ end
 -- Called when the object is broken.
 function die()
 	-- Made object not drop itself upon breaking to handle it through here so mites remain.
-	if storage.mites > 0 then
+	if storage.mites and storage.mites > 0 then
 		local icon = config.getParameter("inventoryIcon").."?border=1;FF0000?fade=007800;0.1"
 		world.spawnItem(object.name(), entity.position(), 1, {mites = storage.mites, inventoryIcon = icon})
 	else
@@ -231,7 +234,7 @@ function beeTick()
 	if queen then
 		-- If last update had a queen, see if the item currently placed in the queen slot is a queen
 		-- If it is, compare indexed and in slot queens genetic code and age, because those are the only differences queens can have
-		-- If its not, clear the index marking the hive as queenless
+		-- If its not, clear the index, marking the hive as queenless, and init the noQueenTimer
 		if contents[queenSlot] and root.itemHasTag(contents[queenSlot].name, "bee") then
 			if root.itemHasTag(contents[queenSlot].name, "queen") then
 				if isSameQueen(queen, contents[queenSlot]) then
@@ -253,9 +256,12 @@ function beeTick()
 				world.containerPutItemsAt(entity.id(), queen, queenSlot-1)
 				contents[queenSlot] = world.containerItemAt(entity.id(), queenSlot-1)
 			else
+				noQueenTimer = noQueenTimeAllowed
 				queen = nil
 			end
 		else
+			-- Mark hive as queenless and init noQueenTimer
+			noQueenTimer = noQueenTimeAllowed
 			queen = nil
 		end
 	else
@@ -317,8 +323,10 @@ function beeTick()
 					droneDecay(slot)
 				end
 			else
-				-- Kill drones if there's no queen present
-				droneDecay(slot)
+				-- Kill drones if there's no queen present, and the no queen timer ran out
+				if noQueenTimer <= 0 then
+					droneDecay(slot)
+				end
 			end
 			
 			-- Kill drones if there are mites present
@@ -343,8 +351,16 @@ function beeTick()
 	-- Kill the queen if there are mites but no drones
 	if hasDrones then
 		miteGrowth()
-	elseif storage.mites > 0 and queen then
-		world.containerTakeAt(entity.id(), queenSlot-1)
+	
+		-- Decay the no queen timer if there's no queen but drones are present
+		if not queen and noQueenTimer > 0 then
+			noQueenTimer = noQueenTimer - beeTickDelta
+		end
+	else
+		noQueenTimer = noQueenTimeAllowed
+		if storage.mites > 0 and queen then
+			world.containerTakeAt(entity.id(), queenSlot-1)
+		end
 	end
 	
 	-- If simulated ticks, check whether there are still bees to be simulated, and stop simulating if there are none
