@@ -360,6 +360,7 @@ function beeTick()
 		noQueenTimer = noQueenTimeAllowed
 		if storage.mites > 0 and queen then
 			world.containerTakeAt(entity.id(), queenSlot-1)
+			queen = nil
 		end
 	end
 	
@@ -534,7 +535,9 @@ function queenProduction()
 		droneProgress = droneProgress % beeData.droneProductionRequirement
 		
 		-- Create the drone item based on the queens name, and copy her genome
-		local drones = {name = "bee_"..family(queen.name).."_drone", count = produced, parameters = copy(queen.parameters)}
+		local params = copy(queen.parameters)
+		params.lifespan = nil
+		local drones = {name = "bee_"..family(queen.name).."_drone", count = produced, parameters = params}
 		
 		-- Find queens offspring drones and increment them if they're present
 		for _, droneSlot in ipairs(droneSlots) do
@@ -543,6 +546,7 @@ function queenProduction()
 			if slotItem and compare(slotItem.parameters, drones.parameters) then
 				world.containerPutItemsAt(entity.id(), drones, droneSlot-1)
 				contents[droneSlot] = world.containerItemAt(entity.id(), droneSlot-1)
+				ageQueen()
 				return
 			end
 		end
@@ -553,6 +557,7 @@ function queenProduction()
 			if not slotItem then
 				world.containerPutItemsAt(entity.id(), drones, droneSlot-1)
 				contents[droneSlot] = world.containerItemAt(entity.id(), droneSlot-1)
+				ageQueen()
 				return
 			end
 		end
@@ -566,6 +571,7 @@ function queenProduction()
 				totalDrones = totalDrones + contents[i].count
 				
 				if totalDrones >= 1000 then
+					ageQueen()
 					return
 				end
 				
@@ -580,6 +586,23 @@ function queenProduction()
 		else
 			world.containerAddItems(entity.id(), drones)
 		end
+	end
+	
+	-- Will not always reach here because of how I wrote the drone adding segment
+	ageQueen()
+end
+
+-- Reduce queens lifespan by 1 each queens production and remove the item if it reaches 0, or re-add it to update the value on the item in storage
+-- By default ages the queen by 1, but can use any other number or negative ones to make her last longer
+-- Can be called from other places (Like the frame scripts)
+function ageQueen(amount)
+	queen.parameters.lifespan = queen.parameters.lifespan - (amount or 1)
+	world.containerTakeAt(entity.id(), queenSlot-1)
+	
+	if (queen.parameters.lifespan > 0) then
+		world.containerPutItemsAt(entity.id(), queen, queenSlot-1)
+	else
+		queen = nil
 	end
 end
 
@@ -655,7 +678,7 @@ end
 function isDroneActive(drone)
 	
 	-- No frames = no activity
-	if not hasFrame then
+	if not hasFrame or not queen then
 		return false
 	end
 	

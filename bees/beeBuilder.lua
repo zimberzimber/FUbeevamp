@@ -29,6 +29,8 @@ function build(directory, config, parameters, level, seed)
 		config.tooltipFields.objectImage = "/assetmissing.png"
 	end
 	
+	parameters.genomeInspected = true
+	
 	-- Display the genome if the bee was inspected
 	if parameters.genomeInspected then
 		require "/bees/genomeLibrary.lua"
@@ -83,6 +85,16 @@ function build(directory, config, parameters, level, seed)
 		config.tooltipFields.miteResistanceLabel = "???"
 		config.tooltipFields.workTimeLabel = "???"
 		config.tooltipFields.genomeLabel = "^gray;Unidentified Bee"
+	end
+	
+	-- Add lifespan counter for queens based on their lifespan stat
+	if root.itemHasTag(config.itemName, "queen") then
+		if not parameters.lifespan then
+			require "/bees/genomeLibrary.lua"
+			parameters.lifespan = genelib.statFromGenomeToValue(parameters.genome, "queenLifespan")
+		end
+	else
+		parameters.lifespan = nil
 	end
 	
 	return config, parameters
