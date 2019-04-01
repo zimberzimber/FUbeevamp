@@ -7,9 +7,9 @@ function build(directory, config, parameters, level, seed)
 	-- populate tooltip fields
 	config.tooltipFields = {}
 	
+	-- Add time left to live element to the tooltip
 	-- for _,tag in ipairs(config.itemTags) do
 		-- if tag == "queen" or tag == "youngQueen" then
-			-- Add time left to live element to the tooltip
 			-- config.tooltipFields.objectImage = "/assetmissing.png"
 		-- end
 	-- end
@@ -29,7 +29,7 @@ function build(directory, config, parameters, level, seed)
 		config.tooltipFields.objectImage = "/assetmissing.png"
 	end
 	
-	parameters.genomeInspected = true
+	-- parameters.genomeInspected = true
 	
 	-- Display the genome if the bee was inspected
 	if parameters.genomeInspected then
