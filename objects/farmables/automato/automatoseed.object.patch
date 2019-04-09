@@ -1,0 +1,9 @@
+[
+	{
+		"op" : "add",
+		"path" : "/beeLikeness",
+		"value" : {
+			"artisan" : 1
+		}
+	}
+]

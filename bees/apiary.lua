@@ -7,13 +7,11 @@ require "/zb/zb_util.lua"
 --[[		Comments:
 
 --[[	TO DO:
-	
 	Implement queen lifespan
-	Add a timer to adding bees so drones don't instadie when there is no queen in the hive for example
-	Get flower likeness
 --]]
 
 --[[	Updating tooltips:
+
 	You must "rebuild" the item.
 	Just copy the items data, add the right tags, removing the original item, and readding the one with the tags
 	Seems like only the builder has access to the tooltips 
@@ -37,7 +35,7 @@ require "/zb/zb_util.lua"
 	Full formula:
 	[D] = 1000 / Local drones in hive
 	[H] = math.min(1 / ((1 + Hives around the hive) * 0.75), 1)
-	[F] = Flower Favor (0.5 / 0.75 / 1 / 1.25)
+	[F] = Flower Favor
 	[B] = Biome Favor (0 / 0.5 / 1 / 1.5)
 	Production Multiplier = ([D] + [H] + [F] + [B]) / 4
 	Production Stat * Production Multiplier * (math.random(90,110) * 0.01)
@@ -77,7 +75,7 @@ specialFrameFunctions = {
 --	Note: These functions are only called once per frame referencing the function every bee tick.
 --	Note: They also don't take into account bee activity, so check for bees as required:
 --		isHiveQueenActive(true) - will return if the queen is active
---		AreDronesActive() - will return if at least one instance of drones is active
+--		areDronesActive() - will return if at least one instance of drones is active
 --	Tip: Use 'beeTickDelta' to get delta between bee ticks.
 
 	advancedFrame = function(data)
@@ -96,9 +94,6 @@ specialFrameFunctions = {
 oldBaseState = nil
 oldBeeState = nil
 oldLoadingState = nil
-
--- Temporary
-flowerFavor = 1					-- Flower likeness
 
 -- Method to differentiate between apiaries and other objects
 function getClass() return "apiary" end
@@ -221,7 +216,7 @@ function beeTick()
 	
 	-- Get amount of hives with active drones in the areas
 	-- NOTE TO SELF: Can call functions inside other objects in a synced manner using this method:
-	local hives = world.objectQuery(entity.position(), 10, {withoutEntityId = entity.id(), callScript = "AreDronesActive", callScriptResult = true})
+	local hives = world.objectQuery(entity.position(), 10, {withoutEntityId = entity.id(), callScript = "areDronesActive", callScriptResult = true})
 	hivesAroundHive = #hives
 	
 	-- Production should be halted if theres a rivalry inside the hive
@@ -371,7 +366,7 @@ function beeTick()
 			ticksToSimulate = 0
 		end
 	else
-		if haltProduction or not AreDronesActive() then
+		if haltProduction or not areDronesActive() then
 			setAnimationStates(true, false, false)
 		else
 			setAnimationStates(true, true, false)
@@ -493,20 +488,22 @@ end
 
 -- Progress queens production
 function queenProduction()
-	
-	-- Get favors based on surroundings
-	-- local flowerFavor = ???
-	
 	-- Get biome favor. Do nothing else if its considered deadly for the bee.
 	local biomeFavor = getBiomeFavor(queen.name)
 	if biomeFavor == -1 then return end
+	
+	-- Get flower favor. Do nothing else if the flower requirements are not met.
+	local family = family(queen.name)
+	local subtypeID = genelib.statFromGenomeToValue(queen.parameters.genome, "subtype")
+	local flowerFavor = getFlowerLikeness(beeData.stats[family][subtypeID].name)
+	if flowerFavor == -1 then return end
 	
 	-- If simulating ticks, ignore every odd tick
 	if ticksToSimulate and ticksToSimulate % 2 == 1 and genelib.statFromGenomeToValue(queen.parameters.genome, "workTime") ~= "both" then
 		return
 	end
 	
-	if not ticksToSimulate then TryBeeSpawn(family(queen.name), queen.parameters.genome) end
+	if not ticksToSimulate then tryBeeSpawn(family, queen.parameters.genome) end
 	
 	-- Queen production is unaffected by hives around hive
 	local productionDrone = genelib.statFromGenomeToValue(queen.parameters.genome, "droneBreedRate") + frameBonuses.droneBreedRate * ((flowerFavor + biomeFavor) / 2)
@@ -537,7 +534,7 @@ function queenProduction()
 		-- Create the drone item based on the queens name, and copy her genome
 		local params = copy(queen.parameters)
 		params.lifespan = nil
-		local drones = {name = "bee_"..family(queen.name).."_drone", count = produced, parameters = params}
+		local drones = {name = "bee_"..family.."_drone", count = produced, parameters = params}
 		
 		-- Find queens offspring drones and increment them if they're present
 		for _, droneSlot in ipairs(droneSlots) do
@@ -629,7 +626,7 @@ function generateYoungQueen()
 end
 
 -- Function for randomizing a stat value for when a new queen is generated
-function RandomMod(num)
+function randomMod(num)
 	local rnd = math.random()
 	
 	if rnd <= 0.05 then -- 5% -3
@@ -707,7 +704,7 @@ function isDroneActive(drone)
 end
 
 -- Function to check if the hive has any currently active drones. Used by other apiary instances to determine their own drone efficiency.
-function AreDronesActive()
+function areDronesActive()
 	-- Return false if the object haven't even inited
 	if not contents then return false end
 	
@@ -730,6 +727,12 @@ function droneProduction(drone)
 	local biomeFavor = getBiomeFavor(drone.name)
 	if biomeFavor == -1 then return end
 	
+	-- Get flower favor. Do nothing else if the flower requirements are not met.
+	local family = family(drone.name)
+	local subtypeID = genelib.statFromGenomeToValue(drone.parameters.genome, "subtype")
+	local flowerFavor = getFlowerLikeness(beeData.stats[family][subtypeID].name)
+	if flowerFavor == -1 then return end
+	
 	-- If simulating ticks, ignore every odd tick
 	if ticksToSimulate and ticksToSimulate % 2 == 1 and genelib.statFromGenomeToValue(drone.parameters.genome, "workTime") ~= "both" then
 		return
@@ -738,8 +741,6 @@ function droneProduction(drone)
 	local productionStat = genelib.statFromGenomeToValue(drone.parameters.genome, "baseProduction") + frameBonuses.baseProduction
 	local production = productionStat * (((drone.count / 1000) + math.min(1 / ((1 + hivesAroundHive) * 0.75), 1) + flowerFavor + biomeFavor) / 4)
 	
-	local family = family(drone.name)
-	local subtypeID = genelib.statFromGenomeToValue(drone.parameters.genome, "subtype")
 	
 	for product, requirement in pairs(beeData.stats[family][subtypeID].production) do
 		if not droneProductionProgress[product] then
@@ -957,8 +958,57 @@ function spaceForBees()
 end
 
 -- Attempt spawning a bee entity to roam about
-function TryBeeSpawn(family, genome)
+function tryBeeSpawn(family, genome)
 	if math.random() <= beeData.beeSpawnChance and spaceForBees() then
 		world.spawnMonster(string.format("bee_%s", family), object.toAbsolutePosition({ 2, 3 }), { genome = genome })
 	end
+end
+
+-- Get flower likeness based on the bees subtype
+function getFlowerLikeness(beeSubtype)
+	local objects = world.objectQuery(entity.position(), beeData.flowerSearchRadius, {withoutEntityId = entity.id(), order = "nearest"})
+	if (#objects < 1) then return -1 end
+	
+	local flowerCount = 0
+	local flowerModifier = 0
+	for _, id in ipairs(objects) do
+		
+		-- Gets the farmables stage, or nil if its not a farmable
+		local stage = world.farmableStage(id)
+		if stage then
+			local stages = world.getObjectParameter(id, "stages", nil)
+			local linekessTable = world.getObjectParameter(id, "beeLikeness", nil)
+			local addition = 0
+			
+			if linekessTable and linekessTable[beeSubtype] then
+				addition = linekessTable[beeSubtype]
+			else
+				addition = beeData.flowerDefaultLikeness
+			end
+			
+			if stage > #stages - 2 then
+				addition = addition * beeData.flowerLastTwoStagesModifier
+			else
+				addition = addition * beeData.flowerLowerStagesModifier
+			end
+			
+			flowerCount = flowerCount + 1
+			if flowerCount > beeData.flowerMinimum then
+				flowerModifier = flowerModifier + addition * beeData.flowerExtrasFavorModifier
+			else
+				flowerModifier = flowerModifier + addition
+			end
+			
+			if flowerCount == beeData.flowerMaximum then break end
+		end
+	end
+	
+	-- Separate formulas for minimum flowers, and more than minimum
+	if (flowerCount <= beeData.flowerMinimum) then
+		flowerModifier = flowerModifier / (beeData.flowerMinimum / flowerCount)
+	end
+	
+	--if (flowerModifier < beeData.flowerMinimumModifierToWork) then
+		--return -1 end
+	return flowerModifier
 end
