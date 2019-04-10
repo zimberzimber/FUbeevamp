@@ -167,7 +167,7 @@ function update(dt)
 			ticksToSimulate = ticksToSimulate - ticks
 			
 			for i = 1, ticks do
-				beeTick(true)
+				beeTick()
 			end
 		else
 			-- Renable interaction if done simulating ticks
@@ -599,6 +599,7 @@ function ageQueen(amount)
 	if (queen.parameters.lifespan > 0) then
 		world.containerPutItemsAt(entity.id(), queen, queenSlot-1)
 	else
+		contents[queenSlot] = nil
 		queen = nil
 	end
 end
@@ -760,7 +761,8 @@ function droneProduction(drone)
 				if not item then break end
 			end
 			
-			if item then
+			-- Drop items if there is no inventory space and the ticks aren't simulted
+			if item and not ticksToSimulate then
 				world.spawnItem(item, entity.position(), nil, nil, nil, 0.5)
 			end
 		end

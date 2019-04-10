@@ -7,13 +7,6 @@ function build(directory, config, parameters, level, seed)
 	-- populate tooltip fields
 	config.tooltipFields = {}
 	
-	-- Add time left to live element to the tooltip
-	-- for _,tag in ipairs(config.itemTags) do
-		-- if tag == "queen" or tag == "youngQueen" then
-			-- config.tooltipFields.objectImage = "/assetmissing.png"
-		-- end
-	-- end
-	
 	-- Mark the bee as wild if it doesn't have a genome, and generate a default one for it
 	-- Wild drones replace their genome with a wild queens genome when in the same hive
 	if not parameters.genome then
@@ -87,11 +80,23 @@ function build(directory, config, parameters, level, seed)
 		config.tooltipFields.genomeLabel = "^gray;Unidentified Bee"
 	end
 	
-	-- Add lifespan counter for queens based on their lifespan stat
+	-- Add lifespan counter for queens based on their lifespan stat and update their lifebar if their genome was inspected
 	if root.itemHasTag(config.itemName, "queen") then
+		require "/bees/genomeLibrary.lua"
+		local fullLifespan = genelib.statFromGenomeToValue(parameters.genome, "queenLifespan")
+		
 		if not parameters.lifespan then
-			require "/bees/genomeLibrary.lua"
-			parameters.lifespan = genelib.statFromGenomeToValue(parameters.genome, "queenLifespan")
+			parameters.lifespan = fullLifespan
+		end
+		
+		if parameters.genomeInspected then
+			local pcntLeft = parameters.lifespan / fullLifespan
+			local lifebar = "/bees/bees/beelifebar.png?replace;000000="..zbutil.ValToHex(1 - pcntLeft)..zbutil.ValToHex(pcntLeft).."00?border=1;000000?fade=007800;0.1"
+			
+			config.inventoryIcon = {
+				{ image = config.inventoryIcon },
+				{ image = lifebar, position = {0, -12} }
+			}
 		end
 	else
 		parameters.lifespan = nil
